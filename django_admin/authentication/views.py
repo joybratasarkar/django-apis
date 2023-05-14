@@ -30,7 +30,11 @@ class RegisterView(APIView):
         print('email',email) 
 
         response = Response()
-        user = User.objects.filter(email=email).first()
+        user = Users.objects.filter(email=email).first()
+        # serialization = UserSerializer(data=request.data)
+        # serialization.is_valid(raise_exception=True)
+        # serialization.save()
+
         print('user',user)
 
         if user is not None:
@@ -92,35 +96,67 @@ class RegisterView(APIView):
         return response
 
 
+# class LoginView(APIView):
+#     def post(self, request):
+#         email = request.data['email']
+#         password = request.data['password']
+
+#         user = Users.objects.filter(email=email).first()
+#         # user.set_password(user.password)
+#         print('user', user)
+#         if user is None:
+#             raise AuthenticationFailed('User not found')
+#         print('password',user.check_password(password))
+#         if user.check_password(password):
+#             payload = {
+#                 'id': user.id,
+#                 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+#                 'iat': datetime.datetime.utcnow()
+#             }
+#             print(payload)
+#             # token=jwt.encode(payload,'secret',algorithm='HS256').decode('utf8')
+#             token = jwt.encode(payload, "secret", algorithm="HS256")
+#             print(token)
+#             response = Response()
+#             response.set_cookie(key='jwt', value=token, httponly=True)
+#             response.data = {
+#                 'message': 'Login successful',
+#                 'jwt': token
+#             }
+#             return response
+
+#         raise AuthenticationFailed('Incorrect password')
 class LoginView(APIView):
     def post(self, request):
         email = request.data['email']
         password = request.data['password']
 
-        user = User.objects.filter(email=email).first()
-        # user.set_password(user.password)
-        print('user',user)
-        if user is None:
+        try:
+            user = Users.objects.get(email=email)
+            print('user',user.password)
+        except Users.DoesNotExist:
             raise AuthenticationFailed('User not found')
 
-        if not user.check_password(password):
-            raise AuthenticationFailed('Incorrect password')
-        payload = {
-            'id': user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
-            'iat': datetime.datetime.utcnow()
-        }
-        print(payload)
-        # token=jwt.encode(payload,'secret',algorithm='HS256').decode('utf8')
-        token = jwt.encode(payload, "secret", algorithm="HS256")
-        print(token)
-        response = Response()
-        response.set_cookie(key='jwt', value=token, httponly=True)
-        response.data = {
-            'message': 'Login successful',
-            'jwt': token
-        }
-        return response
+        if user.check_password(password):
+            print('inside')
+            payload = {
+                'id': user.id,
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+                'iat': datetime.datetime.utcnow()
+            }
+            print(payload)
+            token = jwt.encode(payload, "secret", algorithm="HS256")
+            print(token)
+            response = Response()
+            response.set_cookie(key='jwt', value=token, httponly=True)
+            response.data = {
+                'message': 'Login successful',
+                'jwt': token
+            }
+            return response
+
+        raise AuthenticationFailed('Incorrect password')
+
 
 
 class UserView(APIView):
@@ -134,7 +170,7 @@ class UserView(APIView):
             print(payload)
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Token expired')
-        user = User.objects.filter(id=payload['id']).first()
+        user = Users.objects.filter(id=payload['id']).first()
         serializer = UserSerializer(user)
         print(serializer)
         return Response(serializer.data)
@@ -162,7 +198,7 @@ class forgotPasswordView(APIView):
         print(text_content)
         email = request.data['email']
         response = Response()
-        user = User.objects.filter(email=email).first()
+        user = Users.objects.filter(email=email).first()
         print(user)
         
         serializer = UserSerializer(user)
@@ -198,11 +234,11 @@ class ChangePassword(APIView):
         token = request.COOKIES['jwt']
         decoded_token = jwt.decode(token, 'secret', algorithms=['HS256'])
         id = decoded_token['id']
-        user = User.objects.get(id=id)
+        user = Users.objects.get(id=id)
         email = user.email
         password = request.data['password']
         confirm_password = request.data['confirm_password']
-        user = User.objects.get(email=email)
+        user = Users.objects.get(email=email)
         response = Response()
         if user is not None:
             try:
@@ -234,7 +270,7 @@ class authenticate_user(APIView):
             response = Response()
 
             # check if user already exists
-            user = User.objects.filter(email=email).first()
+            user = Users.objects.filter(email=email).first()
             if user:
                 response.data = {'message': 'User already exists'}
                 return response

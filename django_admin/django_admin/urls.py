@@ -21,7 +21,4 @@ urlpatterns = [
     # path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     path('auth/',include('authentication.urls')),
     # path('test_socket/',include('test_socket.urls')),
-
-
-    
 ]

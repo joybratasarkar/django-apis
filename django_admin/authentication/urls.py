@@ -10,8 +10,7 @@ urlpatterns = [
     path('ChangePassword/', ChangePassword.as_view()),
     path('authenticate/', authenticate_user.as_view()),
     path('confirmRegistration/', confirmRegistration.as_view(),name='confirmRegistration'),
-
-        # path('activate/<token>/', activate.as_view(), name='activate'),
+        path('activate/<token>/', activate.as_view(), name='activate'),
 
 
 ]

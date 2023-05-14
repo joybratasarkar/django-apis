@@ -158,4 +158,5 @@ CHANNEL_LAYERS = {
     },
 }
 
-ASGI_APPLICATION = 'core.asgi.application'
+
+ASGI_APPLICATION = 'django_admin.asgi.application'

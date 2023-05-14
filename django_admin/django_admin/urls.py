@@ -20,5 +20,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     path('auth/',include('authentication.urls')),
+    path('chats/', include('chats.urls')),
+
     # path('test_socket/',include('test_socket.urls')),
 ]

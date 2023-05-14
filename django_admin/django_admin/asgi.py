@@ -7,7 +7,7 @@ from channels.auth import AuthMiddlewareStack
 
 import chats.routing
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_admin.settings')
 # os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
 
 # application = get_asgi_application()

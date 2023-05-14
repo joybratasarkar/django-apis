@@ -15,12 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     path('auth/',include('authentication.urls')),
     path('chats/', include('chats.urls')),
+    # path('', RedirectView.as_view(url='your-angular-app-url/', permanent=False)),
 
     # path('test_socket/',include('test_socket.urls')),
 ]

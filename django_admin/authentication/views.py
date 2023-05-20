@@ -19,6 +19,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 from google.oauth2 import id_token
 from google.auth.transport import requests
+from django.contrib.auth.hashers import make_password
+
 # from django.core.mail import EmailMessage
 
 # Create your views here.
@@ -31,12 +33,6 @@ class RegisterView(APIView):
 
         response = Response()
         user = Users.objects.filter(email=email).first()
-        # serialization = UserSerializer(data=request.data)
-        # serialization.is_valid(raise_exception=True)
-        # serialization.save()
-
-        print('user',user)
-
         if user is not None:
             try:
                 response.data = {
@@ -50,7 +46,6 @@ class RegisterView(APIView):
         else:
             token = str(uuid.uuid4())
             context = {'token': token}
-            current_site = 'localhost:4200/auth/login'
              
             template = 'conformation-email-template.html'
             # html_content = render_to_string(template,context,domain= current_site,)
@@ -60,7 +55,7 @@ class RegisterView(APIView):
             #     'token':token,  
             # })  
             html_content = loader.get_template(template).render(
-                {'domain': current_site, 'context': context, 'token': token},
+                {'context': context, 'token': token},
                 request=request
             )
             
@@ -73,18 +68,8 @@ class RegisterView(APIView):
             )
             message.attach_alternative(html_content, "text/html")
             message.send(fail_silently=False)
-
-            # SignupToken.objects.create(
-            #     token=token,
-            #     name=request.data['name'],
-            #     email=email,
-            #     password=request.data['password']
-            # )
-            # User.objects.create(
-            #     name=request.data['name'],
-            #     email=email,
-            #     password=request.data['password']
-            # )
+            hashed_password = make_password(request.data['password'])
+            request.data['password'] = hashed_password  # Update the password field with the hashed password
             serialization = UserSerializer(data=request.data)
             serialization.is_valid(raise_exception=True)
             serialization.save()
@@ -358,3 +343,11 @@ class activate(APIView):
     # else:  
     #     return HttpResponse('Activation link is invalid!')  
 
+
+
+class UserListView(APIView):
+    def get(self, request):
+        users = Users.objects.all()  # Retrieve all users from the Users model
+        print('users')
+        serializer = UserSerializer(users, many=True)  # Serialize the users if needed
+        return Response(serializer.data)  # Return the serialized data as the API response

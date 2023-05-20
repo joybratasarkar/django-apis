@@ -22,7 +22,5 @@ urlpatterns = [
     # path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     path('auth/',include('authentication.urls')),
     path('chats/', include('chats.urls')),
-    # path('', RedirectView.as_view(url='your-angular-app-url/', permanent=False)),
-
-    # path('test_socket/',include('test_socket.urls')),
+    path('groups/', include('groups.urls')),
 ]

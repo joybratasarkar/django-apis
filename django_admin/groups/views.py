@@ -23,34 +23,29 @@ class UserListView(APIView):
 
 class ServerName(APIView):
     def post(self, request):
-        # server_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-        # print('server_id',server_id)
-        # request.data['server_id'] = server_id
         serializer = ServerSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
+            server = serializer.save()  # Save the serializer object and get the saved Server instance
+            return Response({
+                'id': server.id,
+                'server_name': server.server_name,
+                'member': server.member
+            }, status=201)
         return Response(serializer.errors, status=400)
 
 class GetServerName(APIView):
     def get(self, request):
+        servers = Server.objects.all()  # Retrieve all Server instances
 
-        response = Response()
-        users = Server.objects.all()  # Retrieve all users from the Users model
-        print('users')
-        serializer = ServerSerializer(users, many=True)  # Serialize the users if needed
-        return Response(serializer.data)  # Return the serialized data as the API response
+        # Create a list to store the serialized data with the required fields
+        data = []
+        for server in servers:
+            server_data = {
+                'id': server.id,
+                'server_name': server.server_name,
+                'member': server.member
+            }
+            data.append(server_data)
+
+        return Response(data)  # Return the serialized data as the API response
        
-       
-        #     def post(self, request):
-        # server_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-        # print('server_id',server_id)
-        # print('Server.objects.filter(server_id=server_id).exists()',Server.objects.filter(server_id=server_id).exists())
-        # while Server.objects.filter(server_id=server_id).exists():
-        #     server_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-        # request.data['server_id'] = server_id
-        # serializer = ServerSerializer(data=request.data)
-        # if serializer.is_valid(raise_exception=True):
-        #     serializer.save()
-        #     return Response(serializer.data, status=201)
-        # return Response(serializer.errors, status=400)

@@ -29,13 +29,15 @@ class ServerName(APIView):
             return Response({
                 'id': server.id,
                 'server_name': server.server_name,
-                'member': server.member
             }, status=201)
         return Response(serializer.errors, status=400)
 
 class GetServerName(APIView):
     def get(self, request):
+        print('request',request)
         servers = Server.objects.all()  # Retrieve all Server instances
+        # token = request.COOKIES.get('jwt')
+        # token = request.COOKIES.get('jwt') or request.session.get('jwt')
 
         # Create a list to store the serialized data with the required fields
         data = []
@@ -43,7 +45,6 @@ class GetServerName(APIView):
             server_data = {
                 'id': server.id,
                 'server_name': server.server_name,
-                'member': server.member
             }
             data.append(server_data)
 

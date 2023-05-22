@@ -1,5 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from groups.models import Message
 
 
 class ChatRoomConsumer(AsyncWebsocketConsumer):
@@ -36,6 +37,9 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
                 'username': username,
             }
         )
+        # message = Message(content=message, sender=username, Server=self.room_group_name)
+        # print('message',message)
+        # message.save()
 
     async def chatroom_message(self, event):
         message = event['message']

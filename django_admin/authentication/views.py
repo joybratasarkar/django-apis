@@ -129,9 +129,9 @@ class LoginView(APIView):
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
                 'iat': datetime.datetime.utcnow()
             }
-            print(payload)
+            print('---=======================---payload',payload)
             token = jwt.encode(payload, "secret", algorithm="HS256")
-            print(token)
+            print('===================================token',token)
             response = Response()
             response.set_cookie(key='jwt', value=token, httponly=True)
             response.data = {

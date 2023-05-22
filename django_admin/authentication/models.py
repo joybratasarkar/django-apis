@@ -6,10 +6,12 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from datetime import datetime
 import uuid
 class Users(AbstractUser):
-    name = models.CharField(max_length=255)
+    user_name = models.CharField(max_length=255,unique=True,primary_key=True,)
     email = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
     google_id = models.CharField(max_length=255, default='')
+    # uuid=models.UUIDField(default=uuid.uuid4,editable=False,unique=True)
+
     username = None
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

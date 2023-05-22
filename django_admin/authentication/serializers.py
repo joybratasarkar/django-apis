@@ -4,7 +4,7 @@ from .models import Users
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
-        fields = ['id', 'name', 'email', 'password','google_id']
+        fields = ['user_name', 'email', 'password','google_id']
         extra_kwargs = {
             'password': {'write_only': True, 'min_length': 3, 'required': True},
             # 'name': {'required': False},
@@ -21,10 +21,10 @@ class UserSerializer(serializers.ModelSerializer):
 class AuthenticateUser(serializers.ModelSerializer):
     class Meta:
         model = Users
-        fields = ['id', 'name', 'email', 'password','google_id']
+        fields = ['user_name', 'email', 'password','google_id']
         extra_kwargs = {
             'password': {'write_only': True, 'min_length': 3, 'required': False},
-            'name': {'required': False},
+            'user_name': {'required': False},
             'email': {'required': False}
         }
 

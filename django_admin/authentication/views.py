@@ -29,54 +29,92 @@ from django.contrib.auth.hashers import make_password
 class RegisterView(APIView):
     def post(self, request):
         email = request.data['email']
+        username = request.data['user_name']
         print('email',email) 
-
+        
         response = Response()
-        user = Users.objects.filter(email=email).first()
-        if user is not None:
-            try:
-                response.data = {
-                    'message': 'User already signed up'
-                }
-            except Exception as e:
-                print('-------',e)
-                response.data = {
-                    'message': 'An error occurred while sending the email. Please try again later.'
-                }
+        email_exists = Users.objects.filter(email=email).first()
+        username_exists = Users.objects.filter(user_name=username).exists()
+        print('username',username_exists)
+        if username_exists and email_exists:
+            message = {
+            'message': 'Username and email already exist'
+        }  
+            return Response(message, status=status.HTTP_409_CONFLICT)
+
+        elif email_exists  :
+            message = {
+            'message': 'User email already exist'
+        }
+            return Response(message, status=status.HTTP_409_CONFLICT)
+       
+        elif username_exists:
+            message = {
+            'message': 'User name already exist'
+        }
+            return Response(message, status=status.HTTP_409_CONFLICT)
+
+
+
+            # return response, status.HTTP_409_CONFLICT
         else:
-            token = str(uuid.uuid4())
-            context = {'token': token}
+            try:
+                token = str(uuid.uuid4())
+                context = {'token': token}
              
-            template = 'conformation-email-template.html'
+                template = 'conformation-email-template.html'
             # html_content = render_to_string(template,context,domain= current_site,)
             # html_content = render_to_string(template, {  
             #     'domain': current_site,  
             #     'context':context,
             #     'token':token,  
             # })  
-            html_content = loader.get_template(template).render(
-                {'context': context, 'token': token},
-                request=request
-            )
+                html_content = loader.get_template(template).render(
+                    {'context': context, 'token': token},
+                    request=request
+                )
             
-            text_content = strip_tags(html_content)
-            message = EmailMultiAlternatives(
-                subject='Confirm Your Registration',
-                body=text_content,
-                from_email='joybrata007@gmail.com',
-                to=[email]
-            )
-            message.attach_alternative(html_content, "text/html")
-            message.send(fail_silently=False)
-            hashed_password = make_password(request.data['password'])
-            request.data['password'] = hashed_password  # Update the password field with the hashed password
-            serialization = UserSerializer(data=request.data)
-            serialization.is_valid(raise_exception=True)
-            serialization.save()
-            response.data = {
-                'message': 'An email has been sent to your email address with instructions to confirm your registration.',
-                'token':token
-            }
+                text_content = strip_tags(html_content)
+                message = EmailMultiAlternatives(
+                    subject='Confirm Your Registration',
+                    body=text_content,
+                    from_email='joybrata007@gmail.com',
+                    to=[email]
+                )
+                message.attach_alternative(html_content, "text/html")
+                message.send(fail_silently=False)
+                hashed_password = make_password(request.data['password'])
+                request.data['password'] = hashed_password  # Update the password field with the hashed password
+                serialization = UserSerializer(data=request.data)
+                serialization.is_valid(raise_exception=True)
+                serialization.save()
+
+                response.data = {
+                    'message': 'An email has been sent to your email address with instructions to confirm your registration.',
+                    'token': token
+        }
+            except Exception as e:
+                print('-------', e)
+                response.data = {
+                    'message': 'An error occurred while sending the email. Please try again later.'
+                }
+
+        # if user or username_exists is not None:
+        #     try:
+        #         response.data = {
+        #             'message': 'User already signed up'
+        #         }
+        #     except Exception as e:
+        #         print('-------',e)
+        #         response.data = {
+        #             'message': 'An error occurred while sending the email. Please try again later.'
+        #         }
+        # else:
+
+        #     response.data = {
+        #         'message': 'An email has been sent to your email address with instructions to confirm your registration.',
+        #         'token':token
+        #     }
 
         return response
 
@@ -251,7 +289,7 @@ class authenticate_user(APIView):
             idInfo = id_token.verify_oauth2_token(token, requests.Request())
             email = idInfo['email']
             google_id = idInfo['sub']
-            name = idInfo['name']
+            user_name = idInfo['user_name']
             response = Response()
 
             # check if user already exists
@@ -261,9 +299,9 @@ class authenticate_user(APIView):
                 return response
             else:
                 # create a new user using the token info
-                serializer = UserSerializer(data=request.data, context={'email': email, 'google_id': google_id, 'name': name})
+                serializer = UserSerializer(data=request.data, context={'email': email, 'google_id': google_id, 'user_name': user_name})
                 serializer.is_valid(raise_exception=True)
-                serializer.save(email=email, name=name, google_id=google_id)
+                serializer.save(email=email, user_name=user_name, google_id=google_id)
 
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         except ValueError:
@@ -308,11 +346,11 @@ class confirmRegistration(APIView):
         signup_token = SignupToken.objects.filter(token=token).first()
         print('--------',signup_token)
         if signup_token is not None:
-            context={'name': signup_token.name, 'email':signup_token.email, 'password':signup_token.password}
+            context={'user_name': signup_token.user_name, 'email':signup_token.email, 'password':signup_token.password}
             print('context',context)
             serializer = UserSerializer(data=context )
             serializer.is_valid(raise_exception=True)
-            serializer.save(name=signup_token.name, email=signup_token.email, password=signup_token.password)
+            serializer.save(user_name=signup_token.user_name, email=signup_token.email, password=signup_token.password)
             signup_token.delete()
             return redirect('http://localhost:4200/auth/login')
             # return Response({'message': 'Your registration has been confirmed and you can now log in.'})

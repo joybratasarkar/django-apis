@@ -12,6 +12,7 @@ class Server(models.Model):
     
     # _id = models.ForeignKey(Users,null=True, on_delete=models.CASCADE)
     user_name = models.ForeignKey(Users, null=True, on_delete=models.CASCADE, db_column='user_name')
+    # user_name = models.ForeignKey( null=True)
 
     # created_at = models.DateTimeField(auto_now_add=True)
     id = models.IntegerField(primary_key=True, editable=False)

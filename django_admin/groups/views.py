@@ -40,16 +40,20 @@ class ServerName(APIView):
 
 class GetServerName(APIView):
     def get(self, request):
-        servers = Server.objects.all();
+        print('=-===============')
+        params = request.query_params.get('params')  # Get the value of the 'user_id' parameter from the URL
+
+        user = request.user  # Get the authenticated user
+        servers = Server.objects.filter(user_name=params)  # Retrieve servers belonging to the user
+
+        # servers = Server.objects.all();
         print('servers----------------------',servers)
-  # Retrieve all Server instances
         data = []
         for server in servers:
             print('servers=--------','==========',server,'------------------', server.id, '-----', server.server_name, '-----', server.user_name)
             server_data = { 
                 'id': server.id,
                 'server_name': server.server_name,
-                # 'user_name': server.user_name if server.user_name else None,
             }
             data.append(server_data)
         return Response(data)  # Return the modified data as the API response

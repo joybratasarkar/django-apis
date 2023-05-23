@@ -8,9 +8,13 @@ from datetime import datetime
 class Server(models.Model):
     server_name = models.CharField(max_length=100)
     # server_id = models.CharField(max_length=50, unique=True)
-    id = models.IntegerField(primary_key=True, editable=False)
     # member = models.CharField(max_length=100)
+    
+    # _id = models.ForeignKey(Users,null=True, on_delete=models.CASCADE)
+    user_name = models.ForeignKey(Users, null=True, on_delete=models.CASCADE, db_column='user_name')
+
     # created_at = models.DateTimeField(auto_now_add=True)
+    id = models.IntegerField(primary_key=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True,null=True)
 
 
@@ -25,6 +29,8 @@ class Server(models.Model):
             self.id = id
 
         super().save(*args, **kwargs)
+    def __str__(self):
+        return str(self.user_name)  # Convert the username to a string if it's not already
 
 
 class Message(models.Model):

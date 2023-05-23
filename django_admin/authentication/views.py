@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 
-from .serializers import UserSerializer,AuthenticateUser
+from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 import jwt
@@ -92,7 +92,7 @@ class RegisterView(APIView):
                 response.data = {
                     'message': 'An email has been sent to your email address with instructions to confirm your registration.',
                     'token': token
-        }
+                }
             except Exception as e:
                 print('-------', e)
                 response.data = {
@@ -163,7 +163,6 @@ class LoginView(APIView):
         if user.check_password(password):
             print('inside')
             payload = {
-                'id': user.id,
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
                 'iat': datetime.datetime.utcnow()
             }
@@ -172,9 +171,12 @@ class LoginView(APIView):
             print('===================================token',token)
             response = Response()
             response.set_cookie(key='jwt', value=token, httponly=True)
+            serializer = UserSerializer(user)
+            print('serializer',serializer.data)
             response.data = {
                 'message': 'Login successful',
-                'jwt': token
+                'jwt': token,
+                'user':serializer.data
             }
             return response
 

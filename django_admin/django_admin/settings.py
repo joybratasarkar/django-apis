@@ -91,9 +91,9 @@ WSGI_APPLICATION = 'django_admin.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'angulardjango',
-        'USER': 'test123',
-        'PASSWORD': 'test123',
+        'NAME': 'test_django',
+        'USER': 'test_django',
+        'PASSWORD': 'test_django',
         'HOST': 'localhost',
         'PORT': '5432',
     }

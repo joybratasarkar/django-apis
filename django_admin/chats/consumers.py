@@ -42,8 +42,8 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
 
         # Create the Message object
         # message = Message.objects.create(content=message, sender=users, Server=server)
-        
-        message = await database_sync_to_async(Message.objects.create)(content=message, sender=users, Server=server,Messagetype='sender')
+        # Messagetype='sender'
+        message = await database_sync_to_async(Message.objects.create)(content=message, sender=users, Server=server )
 
         # Send the message to the group
         await self.channel_layer.group_send(
@@ -52,7 +52,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
                 'type': 'chatroom_message',
                 'message': message.content,
                 'username': username,
-                'Messagetype':'sender'
+                # 'Messagetype':'sender'
             }
         )
     async def chatroom_message(self, event):

@@ -60,12 +60,16 @@ class AddServerName(APIView):
 class GetServerName(APIView):
     def get(self, request):
         params = request.query_params.get('params')  # Get the value of the 'user_id' parameter from the URL
-        
+        print('params',params)
         user = request.user  # Get the authenticated user
         # servers = Server.objects.filter(_id=params)  # Retrieve servers belonging to the user
         servers = Server.objects.all()
+        print('servers',servers)
+        print('-------------------------------')
         data = []
         for server in servers:
+            print('---------------------------')
+            print('server',server)
             server_data = { 
                 'id': server.id,
                 '_id': server._id,
@@ -73,7 +77,7 @@ class GetServerName(APIView):
                 'users': []
             }
             for user in server.user.all():
-                print('user',user)
+                print('server_user', server_user)
                 user_data = {
                     'id': user.id,
                     'user_name': user.user_name,

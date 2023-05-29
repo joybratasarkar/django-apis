@@ -9,8 +9,8 @@ from datetime import datetime
 
 class Server(models.Model):
     server_name = models.CharField(max_length=100)
-    user = models.ManyToManyField('ServerUsers', related_name='servers', blank=True)
-    # user = models.ManyToManyField(Users, related_name='servers', blank=True)
+    # user = models.ManyToManyField('ServerUsers', related_name='servers', blank=True)
+    user = models.ManyToManyField(Users, related_name='servers', blank=True)
     # user = models.ForeignKey(Users, null=True, on_delete=models.CASCADE, db_column='user_id', related_name='created_servers')
     _id = models.CharField(editable=False, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True,unique=True)
@@ -43,6 +43,6 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     sender = models.ForeignKey(Users, on_delete=models.CASCADE,null=True)
     Server = models.ForeignKey(Server, on_delete=models.CASCADE,null=True)
-    Messagetype=models.CharField(max_length=100,null=True)
+    # Messagetype=models.CharField(max_length=100,null=True)
     def __str__(self):
         return self.content

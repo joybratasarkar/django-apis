@@ -74,40 +74,22 @@ class GetServerName(APIView):
                 'id': server.id,
                 '_id': server._id,
                 'server_name': server.server_name,
-                'users': []
+                # 'users': []
             }
-            for user in server.user.all():
-                print('server_user', server_user)
-                user_data = {
-                    'id': user.id,
-                    'user_name': user.user_name,
-                    # Include any other user fields you want in the response
-                }
-                server_data['users'].append(user_data)
+            # for user in server.user.all():
+            #     print('server_user', server_user)
+            #     user_data = {
+            #         'id': user.id,
+            #         'user_name': user.user_name,
+            #         # Include any other user fields you want in the response
+            #     }
+            #     server_data['users'].append(user_data)
             
             data.append(server_data)
         
         return Response(data)
 
-# class GetServerName(APIView):
-#     def get(self, request):
-#         user_id = request.query_params.get('params')  # Get the value of the 'user_id' parameter from the URL
 
-#         try:
-#             user = Users.objects.get(user_name=user_id)  # Retrieve the user based on the user_id
-#         except Users.DoesNotExist:
-#             return Response(f"User with id '{user_id}' does not exist", status=400)
-#         print('---------------',user)
-#         servers = Server.objects.filter(members=user)  # Retrieve servers where the user is a member
-#         print('servers','-----------------------------',servers)
-#         data = []
-#         for server in servers:
-#             server_data = { 
-#                 'id': server.id,
-#                 'server_name': server.server_name,
-#             }
-#             data.append(server_data)
-#         return Response(data)  # Return the modified data as the API response
 
        
 class GetAllServerName(APIView):

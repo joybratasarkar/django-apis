@@ -8,7 +8,7 @@ import uuid
 from random import randint
 
 class Users(AbstractUser):
-    user_name = models.CharField(max_length=255,unique=True,primary_key=True,)
+    user_name = models.CharField(max_length=255,unique=True,primary_key=True)
     email = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
     google_id = models.CharField(max_length=255, default='')

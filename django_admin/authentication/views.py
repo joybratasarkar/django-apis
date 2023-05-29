@@ -156,7 +156,7 @@ class LoginView(APIView):
 
         try:
             user = Users.objects.get(email=email)
-            print('user',user.password)
+            print('user',user)
         except Users.DoesNotExist:
             raise AuthenticationFailed('User not found')
 
@@ -171,12 +171,17 @@ class LoginView(APIView):
             print('===================================token',token)
             response = Response()
             response.set_cookie(key='jwt', value=token, httponly=True)
+            print('--------------------',user)
+
             serializer = UserSerializer(user)
             print('serializer',serializer.data)
             response.data = {
                 'message': 'Login successful',
                 'jwt': token,
-                'user':serializer.data
+                'user': {
+                    'id': user.id,
+                    **serializer.data
+                }
             }
             return response
 

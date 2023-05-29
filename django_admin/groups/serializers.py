@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import Server
+from .models import Server,Message
 
 
 class ServerSerializer(serializers.ModelSerializer):
@@ -10,3 +10,7 @@ class ServerSerializer(serializers.ModelSerializer):
 
 
         # fields = '__all__'
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = ['id', 'content', 'timestamp', 'sender', 'Server']

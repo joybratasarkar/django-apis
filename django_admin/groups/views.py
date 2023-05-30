@@ -65,10 +65,8 @@ class GetServerName(APIView):
         # servers = Server.objects.filter(_id=params)  # Retrieve servers belonging to the user
         servers = Server.objects.all()
         print('servers',servers)
-        print('-------------------------------')
         data = []
         for server in servers:
-            print('---------------------------')
             print('server',server)
             server_data = { 
                 'id': server.id,
@@ -95,7 +93,6 @@ class GetServerName(APIView):
 class GetAllServerName(APIView):
     def get(self, request):
         servers = Server.objects.all()  # Retrieve all server instances
-
         data = []
         for server in servers:
             server_data = { 
@@ -106,37 +103,9 @@ class GetAllServerName(APIView):
         
         return Response(data)
 
-
-# class GetMessage(APIView):
-#     def get(self, request):
-#         params = request.query_params.get('params')
-#         print('params',params)
-#         messages = Message.objects.all()
-#         serializer = MessageSerializer(messages, many=True)
-
-#             # print('serializer',serializer)
-#         # return Response({
-#         #  serializer.data,
-#         # }, status=201)
-#         return Response(serializer.data)
-# class GetMessage(APIView):
-#     def get(self, request):
-#         params = request.query_params.get('params')
-#         print('paramstest34', params)
-#         messages = Message.objects.all()
-#         serializer = MessageSerializer(messages, many=True)
-#         for server in serializer.data:  # Assuming `Server` is an array of dictionaries
-#             print(server['Server'])
-#             print(server['Server'] == params)
-#             if server['Server'] == params:  # Replace `field_name` with the actual field name to compare
-#                 print('inside')
-#                 return Response(serializer.data, status=201)
-        
-#         return Response(status=204)  # No content response
 class GetMessage(APIView):
     def get(self, request):
         params = request.query_params.get('params')
-        print('paramstest34', params)
         messages = Message.objects.all()
         serializer = MessageSerializer(messages, many=True)
         matching_servers = []

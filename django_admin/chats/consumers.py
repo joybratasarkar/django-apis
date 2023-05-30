@@ -5,6 +5,7 @@ from authentication.models import Users
 from groups.models import Server
 from channels.db import database_sync_to_async
 from asgiref.sync import sync_to_async
+import threading
 
 
 class ChatRoomConsumer(AsyncWebsocketConsumer):
@@ -41,8 +42,6 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         server = await database_sync_to_async(Server.objects.get)(id=self.room_name)
 
         # Create the Message object
-        # message = Message.objects.create(content=message, sender=users, Server=server)
-        # Messagetype='sender'
         message = await database_sync_to_async(Message.objects.create)(content=message, sender=users, Server=server )
 
         # Send the message to the group

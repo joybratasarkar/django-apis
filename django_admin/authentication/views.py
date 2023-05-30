@@ -20,71 +20,66 @@ from django.utils.html import strip_tags
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from django.contrib.auth.hashers import make_password
-
-# from django.core.mail import EmailMessage
-
-# Create your views here.
+import threading
 
 
 class RegisterView(APIView):
+    def send_email(self, email, html_content):
+        message = EmailMultiAlternatives(
+            subject='Confirm Your Registration',
+            body=strip_tags(html_content),
+            from_email='joybrata007@gmail.com',
+            to=[email]
+        )
+        message.attach_alternative(html_content, "text/html")
+        message.send(fail_silently=False)
+
     def post(self, request):
         email = request.data['email']
         username = request.data['user_name']
-        print('email',email) 
         
         response = Response()
         email_exists = Users.objects.filter(email=email).first()
         username_exists = Users.objects.filter(user_name=username).exists()
-        print('username',username_exists)
+        
         if username_exists and email_exists:
             message = {
-            'message': 'Username and email already exist'
-        }  
+                'message': 'Username and email already exist'
+            }  
             return Response(message, status=status.HTTP_409_CONFLICT)
 
-        elif email_exists  :
+        elif email_exists:
             message = {
-            'message': 'User email already exist'
-        }
+                'message': 'User email already exists'
+            }
             return Response(message, status=status.HTTP_409_CONFLICT)
        
         elif username_exists:
             message = {
-            'message': 'User name already exist'
-        }
+                'message': 'Username already exists'
+            }
             return Response(message, status=status.HTTP_409_CONFLICT)
 
-
-
-            # return response, status.HTTP_409_CONFLICT
         else:
             try:
                 token = str(uuid.uuid4())
                 context = {'token': token}
-             
                 template = 'conformation-email-template.html'
-            # html_content = render_to_string(template,context,domain= current_site,)
-            # html_content = render_to_string(template, {  
-            #     'domain': current_site,  
-            #     'context':context,
-            #     'token':token,  
-            # })  
                 html_content = loader.get_template(template).render(
                     {'context': context, 'token': token},
                     request=request
                 )
             
-                text_content = strip_tags(html_content)
-                message = EmailMultiAlternatives(
-                    subject='Confirm Your Registration',
-                    body=text_content,
-                    from_email='joybrata007@gmail.com',
-                    to=[email]
+                # Send email in a separate thread
+                email_thread = threading.Thread(
+                    target=self.send_email,
+                    args=(email, html_content),
+                    kwargs={}
                 )
-                message.attach_alternative(html_content, "text/html")
-                message.send(fail_silently=False)
+                email_thread.start()
+
                 hashed_password = make_password(request.data['password'])
-                request.data['password'] = hashed_password  # Update the password field with the hashed password
+                request.data['password'] = hashed_password
                 serialization = UserSerializer(data=request.data)
                 serialization.is_valid(raise_exception=True)
                 serialization.save()
@@ -94,61 +89,12 @@ class RegisterView(APIView):
                     'token': token
                 }
             except Exception as e:
-                print('-------', e)
                 response.data = {
                     'message': 'An error occurred while sending the email. Please try again later.'
                 }
 
-        # if user or username_exists is not None:
-        #     try:
-        #         response.data = {
-        #             'message': 'User already signed up'
-        #         }
-        #     except Exception as e:
-        #         print('-------',e)
-        #         response.data = {
-        #             'message': 'An error occurred while sending the email. Please try again later.'
-        #         }
-        # else:
-
-        #     response.data = {
-        #         'message': 'An email has been sent to your email address with instructions to confirm your registration.',
-        #         'token':token
-        #     }
-
         return response
 
-
-# class LoginView(APIView):
-#     def post(self, request):
-#         email = request.data['email']
-#         password = request.data['password']
-
-#         user = Users.objects.filter(email=email).first()
-#         # user.set_password(user.password)
-#         print('user', user)
-#         if user is None:
-#             raise AuthenticationFailed('User not found')
-#         print('password',user.check_password(password))
-#         if user.check_password(password):
-#             payload = {
-#                 'id': user.id,
-#                 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
-#                 'iat': datetime.datetime.utcnow()
-#             }
-#             print(payload)
-#             # token=jwt.encode(payload,'secret',algorithm='HS256').decode('utf8')
-#             token = jwt.encode(payload, "secret", algorithm="HS256")
-#             print(token)
-#             response = Response()
-#             response.set_cookie(key='jwt', value=token, httponly=True)
-#             response.data = {
-#                 'message': 'Login successful',
-#                 'jwt': token
-#             }
-#             return response
-
-#         raise AuthenticationFailed('Incorrect password')
 class LoginView(APIView):
     def post(self, request):
         email = request.data['email']
@@ -239,7 +185,7 @@ class forgotPasswordView(APIView):
                 message = EmailMultiAlternatives(
                 subject='Django HTML Email',
                 body="mail testing",
-                from_email='joybrata007@gmail.com',
+                from_email='test123@yopmail.com',
                 to=[user],
                 
                 )

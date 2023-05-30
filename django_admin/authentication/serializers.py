@@ -36,3 +36,11 @@ class UserSerializer(serializers.ModelSerializer):
 #         google_id = self.context.get('google_id')
 #         name = self.context.get('name')
 #         return 'instance'
+
+class UserSerializerForMessage(serializers.ModelSerializer):
+    class Meta:
+        model = Users
+        fields = ['user_name']
+
+    def create(self, validated_data):
+        self.user.user_name

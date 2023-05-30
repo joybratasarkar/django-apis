@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'chats',
     'groups',
     'channels',
-    'corsheaders'
+    'corsheaders',
+    'django_celery_results',
+    'celery'
     
 ]
 CORS_ORIGIN_ALLOW_ALL = True
@@ -157,6 +159,13 @@ password: EMAIL_HOST_PASSWORD
 use_tls: EMAIL_USE_TLS
 use_ssl: EMAIL_USE_SSL
 
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'  # Replace with your broker URL if using a different message broker
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
 
 CHANNEL_LAYERS = {
     'default': {

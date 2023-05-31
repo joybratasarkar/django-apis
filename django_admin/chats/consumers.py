@@ -10,13 +10,10 @@ from .tasks import create_message
 
 class ChatRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print('----------------------------')
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         print('self.room_name',self.room_name)
         self.room_group_name = 'chat_%s' % self.room_name
         server = await database_sync_to_async(Server.objects.get)(id=self.room_name)
-
-        print('server===============================',server)
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -37,7 +34,6 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         message = text_data_json['message']
         username = text_data_json['username']
         chat_room_id = int(text_data_json['chat_room_id'])
-        print('joytest----------------',chat_room_id)
         # Get the Users and Ser ver objects asynchronously using database_sync_to_async
         users = await database_sync_to_async(Users.objects.get)(user_name=username)
         server = await database_sync_to_async(Server.objects.get)(id=self.room_name)

@@ -6,7 +6,7 @@ from groups.models import Server
 from channels.db import database_sync_to_async
 from asgiref.sync import sync_to_async
 import threading
-
+from .tasks import create_message
 
 class ChatRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -42,14 +42,21 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         server = await database_sync_to_async(Server.objects.get)(id=self.room_name)
 
         # Create the Message object
-        message = await database_sync_to_async(Message.objects.create)(content=message, sender=users, Server=server )
+        message = create_message.delay(message, username, self.room_name)
+
+        # message = await create_message.delay(message, username, self.room_name)
+        # message = message_task.get()  # Wait for the task to complete and get the result
+        # message = await async_to_sync(message_task.get)()
+        message_result = await get_message_result(message)
+        print('message_result',message_result)
+        # message = await database_sync_to_async(Message.objects.create)(content=message, sender=users, Server=server )
 
         # Send the message to the group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chatroom_message',
-                'message': message.content,
+                'message': message_result,
                 'username': username,
                 # 'Messagetype':'sender'
             }
@@ -71,5 +78,6 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             'message': message,
             'username': username,
         }))
-
+async def get_message_result(message_task):
+    return await sync_to_async(message_task.get)()
     pass

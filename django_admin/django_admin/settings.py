@@ -160,7 +160,7 @@ use_tls: EMAIL_USE_TLS
 use_ssl: EMAIL_USE_SSL
 
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379'  # Replace with your broker URL if using a different message broker
-CELERY_RESULT_BACKEND = 'django-db'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
 CELERY_CACHE_BACKEND = 'django-cache'
 
 CELERY_ACCEPT_CONTENT = ['application/json']

@@ -11,7 +11,7 @@ from .tasks import create_message
 class ChatRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
-        print('self.room_name',self.room_name)
+        # print('self.room_name',self.room_name)
         self.room_group_name = 'chat_%s' % self.room_name
         server = await database_sync_to_async(Server.objects.get)(id=self.room_name)
         await self.channel_layer.group_add(
@@ -22,49 +22,89 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
-        print('disconnect',self)
+        # print('disconnect',self)
 
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
-
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         username = text_data_json['username']
+        # time = text_data_json['time']
         chat_room_id = int(text_data_json['chat_room_id'])
-        # Get the Users and Ser ver objects asynchronously using database_sync_to_async
+
+        # Get the Users and Server objects asynchronously using database_sync_to_async
         users = await database_sync_to_async(Users.objects.get)(user_name=username)
         server = await database_sync_to_async(Server.objects.get)(id=self.room_name)
-        # server = await database_sync_to_async(Server.objects.get)(id=self.room_name)
 
         # Create the Message object
-        message = create_message.delay(message, username, self.room_name)
+        print('--------------------------------------------------',message)
+        # message_task = create_message.delay(message, username, self.room_name)
+        # message_result = await get_message_result(message_task)
 
-        # message = await create_message.delay(message, username, self.room_name)
-        # message = message_task.get()  # Wait for the task to complete and get the result
-        # message = await async_to_sync(message_task.get)()
-        message_result = await get_message_result(message)
-        print('message_result',message_result)
+        # # Create the Message object
+        message_obj = await database_sync_to_async(Message.objects.create)(
+            content=message,
+            sender=users,
+            Server=server
+        )
         # message = await database_sync_to_async(Message.objects.create)(content=message, sender=users, Server=server )
+        # message_obj = await database_sync_to_async(Message.objects.create)(
+        #     content=message,
+        #     sender=users,
+        #     Server=server
+        # )
+
 
         # Send the message to the group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chatroom_message',
-                'message': message_result,
+                'message': message,
                 'username': username,
                 # 'Messagetype':'sender'
             }
         )
+
+    # async def receive(self, text_data):
+    #     text_data_json = json.loads(text_data)
+    #     message = text_data_json['message']
+    #     username = text_data_json['username']
+    #     chat_room_id = int(text_data_json['chat_room_id'])
+    #     # Get the Users and Ser ver objects asynchronously using database_sync_to_async
+    #     users = await database_sync_to_async(Users.objects.get)(user_name=username)
+    #     server = await database_sync_to_async(Server.objects.get)(id=self.room_name)
+    #     # server = await database_sync_to_async(Server.objects.get)(id=self.room_name)
+
+    #     # Create the Message object
+    #     message = create_message.delay(message, username, self.room_name)
+
+    #     # message = await create_message.delay(message, username, self.room_name)
+    #     # message = message_task.get()  # Wait for the task to complete and get the result
+    #     # message = await async_to_sync(message_task.get)()
+    #     message_result = await get_message_result(message)
+    #     print('message_result',message_result)
+    #     # message = await database_sync_to_async(Message.objects.create)(content=message, sender=users, Server=server )
+
+    #     # Send the message to the group
+    #     await self.channel_layer.group_send(
+    #         self.room_group_name,
+    #         {
+    #             'type': 'chatroom_message',
+    #             'message': message_result,
+    #             'username': username,
+    #             # 'Messagetype':'sender'
+    #         }
+    #     )
     async def chatroom_message(self, event):
         message = event['message']
         username = event['username']
-        print('message',message)
-        print('username',username)
-        print('chatroom_message================test',message)
+        # print('message',message)
+        # print('username',username)
+        # print('chatroom_message================test',message)
         users = await database_sync_to_async(Users.objects.get)(user_name=username)
         server = await database_sync_to_async(Server.objects.get)(id=self.room_name)
 

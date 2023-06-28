@@ -6,6 +6,6 @@ from .views import UserListView,SendMessage
 
 urlpatterns = [
     path('users/', UserListView.as_view(), name='user-list'),
-        path('message/', SendMessage.as_view(), name='message'),
+    path('message/', SendMessage.as_view(), name='message'),
 
 ]

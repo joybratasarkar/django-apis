@@ -8,6 +8,7 @@ import random
 import string
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.core.paginator import Paginator
 
 class ServerName(APIView):
     def post(self, request):
@@ -104,4 +105,55 @@ class GetMessage(APIView):
             return Response(serializer.data, status=201)
         else:
             return Response(status=204)
+
+# class GetMessage(APIView):
+#     def get(self, request):
+#         params = request.query_params.get('params')
+#         page_number = request.query_params.get('page', 1)  # Default to page 1 if not provided
+#         param_value = str(params)
+#         matching_messages = Message.objects.filter(Server__id__iexact=param_value).order_by('-timestamp')
+
+#         paginator = Paginator(matching_messages, 10)  # Set the number of items per page
+
+#         page_obj = paginator.get_page(page_number)
+
+#         serializer = MessageSerializer(page_obj, many=True)
+
+#         if page_obj.has_other_pages():
+#             next_page_number = page_obj.next_page_number()
+#             return Response({'messages': serializer.data, 'next_page': next_page_number}, status=200)
+#         else:
+#             return Response({'messages': serializer.data, 'next_page': None}, status=200)
+
+
+# class GetMessage(APIView):
+#     def get(self, request):
+#         params = request.query_params.get('params')
+#         page_number = int(request.query_params.get('page', 1))  # Default to page 1 if not provided
+#         param_value = str(params)
+        
+#         matching_messages = Message.objects.filter(Server__id__iexact=param_value).order_by('-timestamp')
+#         paginator = Paginator(matching_messages, 10)  # Set the number of items per page
+        
+#         try:
+#             page_obj = paginator.page(page_number)
+#         except InvalidPage:
+#             return Response({'message': 'Invalid page number.'}, status=400)
+        
+#         serializer = MessageSerializer(page_obj, many=True)
+        
+#         if page_obj.has_next():
+#             next_page_number = page_obj.next_page_number()
+#         else:
+#             next_page_number = None
+        
+#         if page_obj.has_previous():
+#             previous_page_number = page_obj.previous_page_number()
+#         else:
+#             previous_page_number = None
+
+#         total_pages = paginator.num_pages
+
+#         return Response({'messages': serializer.data, 'next_page': next_page_number, 'previous_page': previous_page_number, 'total_pages': total_pages}, status=200)
+
 

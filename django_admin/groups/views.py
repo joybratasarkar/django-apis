@@ -9,6 +9,7 @@ import string
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
+import jwt
 
 class ServerName(APIView):
     def post(self, request):
@@ -22,15 +23,11 @@ class ServerName(APIView):
 
         server = Server.objects.create(server_name=server_name,_id=id)
         server.user.add(user)
-
         return Response({
             'id': id,
             'server_name': server.server_name,
             'user_name': user.user_name,
         }, status=201)
-
-
-
 class AddServerName(APIView):
     def post(self, request):
         user_id = request.data['user_name']
@@ -56,11 +53,12 @@ class AddServerName(APIView):
 class GetServerName(APIView):
     def get(self, request):
         params = request.query_params.get('params')  # Get the value of the 'user_id' parameter from the URL
-        print('params---------------------------------',params)
+        # print('params---------------------------------',params)
+        print('--------------------------------------')
+      
         user = request.user  # Get the authenticated user
         # servers = Server.objects.filter(_id=params)  # Retrieve servers belonging to the user
         servers = Server.objects.all()
-        # print('servers',servers)
         data = []
         for server in servers:
             # print('server',server)
@@ -94,13 +92,10 @@ class GetAllServerName(APIView):
 class GetMessage(APIView):
     def get(self, request):
         params = request.query_params.get('params')
-        print('params',params)
         # Use a case-insensitive filter query to retrieve matching messages
         param_value = str(params)
         matching_messages = Message.objects.filter(Server__id__iexact=param_value).order_by('-timestamp')
-        print('matching_messages',matching_messages)
         serializer = MessageSerializer(matching_messages, many=True)
-
         if matching_messages:
             return Response(serializer.data, status=201)
         else:

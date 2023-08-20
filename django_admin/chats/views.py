@@ -12,8 +12,10 @@ from rest_framework.permissions import IsAuthenticated
 class UserListView(APIView):
     def get(self, request):
         response = Response()
+     
+        print(token)
         users = Users.objects.all()  # Retrieve all users from the Users model
-        print('users')
+        # print('users')
         serializer = UserSerializer(users, many=True)  # Serialize the users if needed
         return Response(serializer.data)  # Return the serialized data as the API response
 
@@ -24,10 +26,12 @@ class SendMessage(APIView):
         content = request.data.get('content')
         sender_id = request.data.get('sender_id')
         server_id = request.data.get('server_id')
-
+        # token = request.COOKIES['jwt']
+        # print('token',token)
+      
         # Retrieve the authorization token from the request headers
         authorization_header = request.headers.get('Authorization')
-        print('authorization_header',authorization_header)
+        # print('authorization_header',authorization_header)
         if authorization_header:
             token = authorization_header.split(' ')[1]
         else:

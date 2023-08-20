@@ -4,6 +4,8 @@ from . import consumers
 websocket_urlpatterns = [
     re_path(r'ws/chat/(?P<room_name>\w+)/$', consumers.ChatRoomConsumer.as_asgi()),
     # re_path(r'ws/video/(?P<video_room_id>\w+)/', consumers.VideoStreamingConsumer.as_asgi()),
-        re_path(r'ws/video/(?P<room_name>\w+)/$', consumers.WebRTCConsumer.as_asgi()),
+        # re_path(r'ws/video/(?P<room_name>\w+)/$', consumers.WebRTCConsumer.as_asgi()),
+re_path(r'ws/video/(?P<room_name>\w+)/(?P<id>\d+)/$', consumers.WebRTCConsumer.as_asgi()),
 
+# re_path(r'ws/video/(?P<room_name>\w+)/(?P<id>\d+)/(?P<token>\w+)/$', consumers.WebRTCConsumer.as_asgi()),
 ]
